@@ -8,14 +8,7 @@
 
 ### Linux
 
-- Open or create ```/etc/udev/rules.d/51-android.rules``` as **root**
-- Add the following lines to the file
-```
-# Samsung Exynos USB Boot Mode
-SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", ATTR{idProduct}=="1234", MODE="0660", GROUP="dialout"
-```
-- Save the file and exit your editor
-- Run ```sudo udevadm control --reload && sudo udevadm trigger``` to reload UDEV rules
+- Run ```bash udev_rules.sh``` as root to setup udev rules
 - You can now run the tool.
 
 ### Windows
