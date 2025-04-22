@@ -4,7 +4,7 @@
  - Why not?
  - I don't want people to be paying to unbrick their devices
 
-## Platform preperation
+## Environment preparation
 
 ### Linux
 
@@ -18,7 +18,7 @@
 - Install the ones provided by right clicking the inf and pressing install
 - You can now run the tool.
 
-## How do I use it?
+## How to use
  - Install required python packages via ```pip3 install -r requirements.txt```
  - Run the tool, pointing to your bootloader tar file via ```python3 hubble.py -b <PATH_TO_BL_TAR>```
  - Plug in your bricked phone
