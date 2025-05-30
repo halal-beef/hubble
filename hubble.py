@@ -331,7 +331,7 @@ def main():
     logger.warning(f"Starting USB booting...")
     print()
 
-    if os.name !="nt":
+    if os.name != "nt":
         if device.is_kernel_driver_active(0):
             device.detach_kernel_driver(0)
 
