@@ -12,14 +12,17 @@ import coloredlogs
 import logging
 from time import sleep
 
-soc              = ""
-
-logger           = logging.getLogger(__name__)
+soc     = ""
+logger  = logging.getLogger(__name__)
+verbose = False
 
 exynos_data = [
     [
         # SoC Name
         "Exynos9830\0",
+
+        # Supports Responses
+        True,
 
         [ # S-Boot Split Values
             ["fwbl1.img", 0x0, 0x3000],
@@ -49,6 +52,9 @@ exynos_data = [
         # SoC Name
         "Exynos9820\0",
 
+        # Supports Responses
+        True,
+
         [ # S-Boot Split Values
             ["epbl.img", 0x0, 0x3000],
             ["fwbl1.img", 0x3000, 0x16000],
@@ -66,6 +72,34 @@ exynos_data = [
         ],
 
         [ # Files to Send
+        ]
+    ],
+
+    [
+        # SoC Name
+        "Exynos9810\0",
+
+        # Supports Responses
+        False,
+
+        [ # S-Boot Split Values
+            ["epbl.img", 0x0, 0x2000],
+            ["fwbl1.img", 0x2000, 0x15000],
+            ["bl2.img", 0x15000, 0x64000],
+            ["epbl.img", 0x0, 0x2000], # Repeat to Load sboot Successfully.
+            ["sboot.bin", 0x7D000, 0x1FD000],
+            ["el3_mon.img", 0x1FD000, 0x23D000]
+        ],
+
+        [  # Files to Extract (TAR)
+            "sboot.bin.lz4",
+        ],
+
+        [  # Files to Extract (LZ4)
+            "sboot.bin.lz4"
+        ],
+
+        [  # Files to Send
         ]
     ]
 ]
@@ -133,6 +167,22 @@ def send_part_to_device(device, file, filename):
     calculate_checksum(file)
 
     ret = device.write(2, file, timeout=50000)
+
+    for soc_data in exynos_data:
+        if soc == soc_data[0]:
+            if soc_data[1] == True and verbose == True:
+                while True:
+                    try:
+                        data = device.read(0x81, 512, timeout=1000)
+
+                        byte_str = ''.join(chr(n) for n in data[0:])
+                        response = byte_str.split('\x00',1)[0]
+
+                        if len(response) != 0:
+                            logger.debug(f"=> Device Response: {response}")
+                    except:
+                        break
+
     if ret == file_size:
         logger.info(f"=> {ret} bytes written.")
     else:
@@ -145,7 +195,7 @@ def send_part_to_device(device, file, filename):
 def filter_tar(tarinfo, unused):
     for soc_data in exynos_data:
         if soc == soc_data[0]:
-            if tarinfo.name in soc_data[2]:
+            if tarinfo.name in soc_data[3]:
                 logger.warning(f"Extracted: {tarinfo.name}")
                 return tarinfo
 
@@ -163,7 +213,7 @@ def extract_bl_tar(path):
 
     for soc_data in exynos_data:
         if soc == soc_data[0]:
-            for resultant_bin in soc_data[3]:
+            for resultant_bin in soc_data[4]:
                 with open(resultant_bin, 'rb') as input_lz4:
                     try:
                         filename_no_lz4 = os.path.splitext(resultant_bin)[0]
@@ -217,6 +267,8 @@ def display_and_verify_device_info(device):
     sys.exit(-1)
 
 def main():
+    global verbose
+
     coloredlogs.install(
         level="DEBUG",
         fmt="%(asctime)s %(message)s",
@@ -251,8 +303,9 @@ def main():
     logger.info("https://github.com/halal-beef/hubble")
     print()
 
-    parser = argparse.ArgumentParser(description="USB Recovery Tool for Exynos9830 based devices.")
+    parser = argparse.ArgumentParser(description="USB Recovery Tool for Exynos devices.")
     parser.add_argument('-b', '--bl-tar', type=str, help="Path to the .tar or .tar.md5 file", required=True)
+    parser.add_argument('-v', '--verbose', action="store_true", help="Enables more Logs during Operation")
 
     args = parser.parse_args()
 
@@ -262,6 +315,9 @@ def main():
         else:
             logger.critical(f"Error: The file {args.bl_tar} does not exist or is not a valid file.")
             sys.exit(-1)
+
+    if args.verbose:
+        verbose = True
 
     logger.warning("Waiting for device")
     device = find_device()
@@ -284,7 +340,7 @@ def main():
     with open("sboot.bin", "rb") as sboot:
         for soc_data in exynos_data:
             if soc == soc_data[0]:
-                for sboot_split in soc_data[1]:
+                for sboot_split in soc_data[2]:
                     try:
                         logger.debug(f"Sending file part {sboot_split[0]} (0x{sboot_split[1]:X} - 0x{sboot_split[2]:X})...")
 
@@ -304,7 +360,7 @@ def main():
 
     for soc_data in exynos_data:
         if soc == soc_data[0]:
-            for download_file in soc_data[4]:
+            for download_file in soc_data[5]:
                 logger.debug(f"Sending file {download_file}...")
 
                 download_data = load_file(download_file)
@@ -324,10 +380,10 @@ def main():
     try:
         for soc_data in exynos_data:
             if soc == soc_data[0]:
-                for resultant_lz4 in soc_data[4]:
+                for resultant_lz4 in soc_data[5]:
                     delete_file(resultant_lz4)
 
-                for resultant_bin in soc_data[3]:
+                for resultant_bin in soc_data[4]:
                     filename_no_lz4 = os.path.splitext(resultant_bin)[0]
 
                     delete_file(filename_no_lz4)

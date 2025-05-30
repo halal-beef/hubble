@@ -1,29 +1,31 @@
-# Hubble - A USB Recovery Tool for devices based on Exynos9830 or Exynos9820
+# Hubble - A USB Recovery Tool for Exynos devices
 
 ## Why?
- - Why not?
- - I don't want people to be paying to unbrick their devices
+
+  - Why not?
+  - I don't want people to be paying to unbrick their devices
 
 ## Environment preparation
 
 ### Linux
 
-- Run ```bash udev_rules.sh``` as root to setup udev rules
-- You can now run the tool.
+  - Run ```bash udev_rules.sh``` as root to setup udev rules
+  - You can now run the tool.
 
 ### Windows
 
-- Uninstall any existing BootROM Drivers
-- Import the needed certificates by double clicking the ```## Driver Certificate (INSTALL ME FIRST BEFORE THE DRIVER).reg``` file and importing the regkeys
-- Install the ones provided by right clicking the inf and pressing install
-- You can now run the tool.
+  - Uninstall any existing BootROM Drivers
+  - Import the needed certificates by double clicking the ```## Driver Certificate (INSTALL ME FIRST BEFORE THE DRIVER).reg``` file and importing the regkeys
+  - Install the ones provided by right clicking the inf and pressing install
+  - You can now run the tool.
 
 ## How to use
- - Install required python packages via ```pip3 install -r requirements.txt```
- - Run the tool, pointing to your bootloader tar file via ```python3 hubble.py -b <PATH_TO_BL_TAR>```
- - Plug in your bricked phone
- - Let it run it's magic
- - Reflash the stock firmware
+
+  - Install required python packages via ```pip3 install -r requirements.txt```
+  - Run the tool, pointing to your bootloader tar file via ```python3 hubble.py -b <PATH_TO_BL_TAR>```
+  - Plug in your bricked phone
+  - Let it run it's magic
+  - Reflash the stock firmware
 
 ## Recovery demo
 
@@ -31,29 +33,47 @@ https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 
 ## Supported devices
 
- - [ ] Means your device is most likely supported but not tested
- - [x] Means your device is supported and tested
+| Symbol | Meaning      |
+|:------:|:------------:|
+| ✅     | Working     |
+| ❌     | Not Working |
+| ❔     | Unknown     |
 
-Exynos 9830 Devices:
+### Exynos 9830 Devices
 
- - [x] Samsung Galaxy S20 (x1s/lte)
- - [x] Samsung Galaxy S20 Ultra (z3s/lte)
- - [ ] Samsung Galaxy S20+ (y2s/lte)
- - [ ] Samsung Galaxy S20 FE (r8s)
- - [ ] Samsung Galaxy Note20 (c1s/lte)
- - [ ] Samsung Galaxy Note20 Ultra (c2s/lte)
+| Name                 | Codename | Tested Firmware | Tested by                                   | State |
+|:---------------------|:---------|:---------------:|:--------------------------------------------|:-----:|
+| Galaxy S20           | x1s      | ?               | [halal-beef](https://github.com/halal-beef) | ✅    |
+| Galaxy S20+          | y2s      | ?               | None                                        | ❔    |
+| Galaxy S20 Ultra     | z3s      | ?               | [BotchedRPR](https://github.com/BotchedRPR) | ✅    |
+| Galaxy S20 FE        | r8s      | ?               | None                                        | ❔    |
+| Galaxy Note 20       | c1s      | ?               | None                                        | ❔    |
+| Galaxy Note 20 Ultra | c2s      | ?               | None                                        | ❔    |
 
-Exynos 9820 Devices:
+### Exynos 9820 Devices
 
- - [ ] Samsung Galaxy S10e (beyond0lte)
- - [x] Samsung Galaxy S10 (beyond1lte)
- - [ ] Samsung Galaxy S10+ (beyond2lte)
- - [ ] Samsung Galaxy S10 5G (beyondx)
+| Name          | Codename   | Tested Firmware | Tested by                               | State |
+|:--------------|:-----------|:---------------:|:----------------------------------------|:-----:|
+| Galaxy S10    | beyond1lte | `G973FXXSGHWC2` | [Robotix](https://github.com/Robotix22) | ✅    |
+| Galaxy S10e   | beyond0lte | ?               | None                                    | ❔    |
+| Galaxy S10+   | beyond2lte | ?               | None                                    | ❔    |
+| Galaxy S10 5G | beyondx    | ?               | None                                    | ❔    |
+
+### Exynos 9810 Devices
+
+| Name                | Codename   | Tested Firmware | Tested by                               | State |
+|:--------------------|:-----------|:---------------:|:----------------------------------------|:-----:|
+| Galaxy S9           | starlte    | `G960FXXUHFVG4` | [Robotix](https://github.com/Robotix22) | ✅    |
+| Galaxy S9+          | star2lte   | ?               | None                                    | ❔    |
+| Galaxy Note 9       | crownlte   | ?               | None                                    | ❔    |
+| Galaxy Note 10 Lite | davinci    | ?               | None                                    | ❔    |
 
 ## Credits
- - [VDavid003](https://github.com/vdavid003) ```Helped me get the BL2 split on the bootloader```
- - [gaitenis](https://xdaforums.com/m/gaitenis.13049039) ```Finding lk.bin split```
- - [halal-beef](https://github.com/halal-beef) ```Initial idea, writing the tool and getting most of the splits```
- - [BotchedRPR](https://github.com/BotchedRPR) ```Loads of support and bricked his S20 Ultra for testing splits, absolute legend```
- - [Robotix](https://github.com/Robotix22) ```Added Exynos 9820 Support, Tested splits on his Galaxy S10```
- - [alextrack2013](https://github.com/alextrack2013) ```Added udev setup script, fixed my spelling errors```
+
+Thanks to these people:
+
+[VDavid003](https://github.com/vdavid003) for Helping on the BL2 split for Exynos 9830. <br>
+[gaitenis](https://xdaforums.com/m/gaitenis.13049039) found the LK Split for Exynos 9830. <br>
+[halal-beef](https://github.com/halal-beef) for finding most of the Exynos 9830 Splits & for the initial Idea. <br>
+[Robotix](https://github.com/Robotix22) for adding Support for Exynos 9820 & 9810. <br>
+[alextrack2013](https://github.com/alextrack2013) for adding proper Linux Docs.
