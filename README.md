@@ -44,7 +44,7 @@ https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 | Name                 | Codename | Tested Firmware | Tested by                                   | State |
 |:---------------------|:---------|:---------------:|:--------------------------------------------|:-----:|
 | Galaxy S20           | x1s      | `G981BXXSMHXK1` | [halal-beef](https://github.com/halal-beef) | ✅    |
-| Galaxy S20+          | y2s      | ?               | None                                        | ❔    |
+| Galaxy S20+          | y2s      | `G986BXXSNHYB1` | [Android-Artisan](https://github.com/Android-Artisan) | ✅    |
 | Galaxy S20 Ultra     | z3s      | `G988BXXSMHXK1` | [BotchedRPR](https://github.com/BotchedRPR) | ✅    |
 | Galaxy S20 FE        | r8s      | ?               | None                                        | ❔    |
 | Galaxy Note 20       | c1s      | ?               | None                                        | ❔    |
