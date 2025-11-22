@@ -12,97 +12,11 @@ import coloredlogs
 import logging
 from time import sleep
 
+from soc_data import EXYNOS_DATA
+
 soc     = ""
 logger  = logging.getLogger(__name__)
 verbose = False
-
-exynos_data = [
-    [
-        # SoC Name
-        "Exynos9830\0",
-
-        # Supports Responses
-        True,
-
-        [ # S-Boot Split Values
-            ["fwbl1.img", 0x0, 0x3000],
-            ["epbl.img", 0x3000, 0x16000],
-            ["bl2.img", 0x16000, 0x82000],
-            ["lk.bin", 0xDB000, 0x35B000],
-            ["el3_mon.img", 0x35B000, 0x39B000]
-        ],
-
-        [ # Files to Extract (TAR)
-            "sboot.bin.lz4",
-            "ldfw.img.lz4",
-            "tzsw.img.lz4"
-        ],
-
-        [ # Files to Extract (LZ4)
-            "sboot.bin.lz4"
-        ],
-
-        [ # Files to Send
-            "ldfw.img.lz4",
-            "tzsw.img.lz4"
-        ]
-    ],
-
-    [
-        # SoC Name
-        "Exynos9820\0",
-
-        # Supports Responses
-        True,
-
-        [ # S-Boot Split Values
-            ["epbl.img", 0x0, 0x3000],
-            ["fwbl1.img", 0x3000, 0x16000],
-            ["bl2.img", 0x16000, 0x68000],
-            ["sboot.bin", 0xA4000, 0x224000],
-            ["el3_mon.img", 0x224000, 0x264000]
-        ],
-
-        [ # Files to Extract (TAR)
-            "sboot.bin.lz4"
-        ],
-
-        [ # Files to Extract (LZ4)
-            "sboot.bin.lz4"
-        ],
-
-        [ # Files to Send
-        ]
-    ],
-
-    [
-        # SoC Name
-        "Exynos9810\0",
-
-        # Supports Responses
-        False,
-
-        [ # S-Boot Split Values
-            ["epbl.img", 0x0, 0x2000],
-            ["fwbl1.img", 0x2000, 0x15000],
-            ["bl2.img", 0x15000, 0x64000],
-            ["epbl.img", 0x0, 0x2000], # Repeat to Load sboot Successfully.
-            ["sboot.bin", 0x7D000, 0x1FD000],
-            ["el3_mon.img", 0x1FD000, 0x23D000]
-        ],
-
-        [  # Files to Extract (TAR)
-            "sboot.bin.lz4",
-        ],
-
-        [  # Files to Extract (LZ4)
-            "sboot.bin.lz4"
-        ],
-
-        [  # Files to Send
-        ]
-    ]
-]
 
 def write_u32(value):
     return struct.pack('<I', value)
@@ -168,20 +82,18 @@ def send_part_to_device(device, file, filename):
 
     ret = device.write(2, file, timeout=50000)
 
-    for soc_data in exynos_data:
-        if soc == soc_data[0]:
-            if soc_data[1] == True and verbose == True:
-                while True:
-                    try:
-                        data = device.read(0x81, 512, timeout=1000)
+    if EXYNOS_DATA[soc]["response_support"] == True and verbose == True:
+        while True:
+            try:
+                data = device.read(0x81, 512, timeout=1000)
 
-                        byte_str = ''.join(chr(n) for n in data[0:])
-                        response = byte_str.split('\x00',1)[0]
+                byte_str = ''.join(chr(n) for n in data[0:])
+                response = byte_str.split('\x00',1)[0]
 
-                        if len(response) != 0:
-                            logger.debug(f"=> Device Response: {response}")
-                    except:
-                        break
+                if len(response) != 0:
+                    logger.debug(f"=> Device Response: {response}")
+            except:
+                break
 
     if ret == file_size:
         logger.info(f"=> {ret} bytes written.")
@@ -193,11 +105,9 @@ def send_part_to_device(device, file, filename):
     print()
 
 def filter_tar(tarinfo, unused):
-    for soc_data in exynos_data:
-        if soc == soc_data[0]:
-            if tarinfo.name in soc_data[3]:
-                logger.warning(f"Extracted: {tarinfo.name}")
-                return tarinfo
+    if tarinfo.name in EXYNOS_DATA[soc]["files_to_extract_from_tar"]:
+        logger.warning(f"Extracted: {tarinfo.name}")
+        return tarinfo
 
     return None
 
@@ -211,30 +121,28 @@ def extract_bl_tar(path):
 
     tar.close()
 
-    for soc_data in exynos_data:
-        if soc == soc_data[0]:
-            for resultant_bin in soc_data[4]:
-                with open(resultant_bin, 'rb') as input_lz4:
-                    try:
-                        filename_no_lz4 = os.path.splitext(resultant_bin)[0]
+    for resultant_bin in EXYNOS_DATA[soc]["lz4_files_to_extract"]:
+        with open(resultant_bin, 'rb') as input_lz4:
+            try:
+                filename_no_lz4 = os.path.splitext(resultant_bin)[0]
 
-                        with open(filename_no_lz4, 'wb') as output_bin:
-                            output_bin.write(lz4.frame.decompress(input_lz4.read()))
+                with open(filename_no_lz4, 'wb') as output_bin:
+                    output_bin.write(lz4.frame.decompress(input_lz4.read()))
 
-                            output_bin.close()
+                    output_bin.close()
 
-                        logger.warning(f"Extracted: {filename_no_lz4}")
-                    except:
-                        logger.critical("Failure in extracting LZ4 archives! Bailing!")
-                        sys.exit(-1)
+                logger.warning(f"Extracted: {filename_no_lz4}")
+            except:
+                logger.critical("Failure in extracting LZ4 archives! Bailing!")
+                sys.exit(-1)
 
-                input_lz4.close()
+        input_lz4.close()
 
-                try:
-                    delete_file(resultant_bin)
-                except:
-                    logger.critical("Failure in preliminary cleanup! Bailing!")
-                    sys.exit(-1)
+        try:
+            delete_file(resultant_bin)
+        except:
+            logger.critical("Failure in preliminary cleanup! Bailing!")
+            sys.exit(-1)
 
     print()
 
@@ -259,8 +167,8 @@ def display_and_verify_device_info(device):
     logger.info(f"USB Booting Version: {usb_booting_version[12:16]}".center(60))
     print()
 
-    for soc_data in exynos_data:
-        if soc == soc_data[0]:
+    for soc_name in EXYNOS_DATA.keys():
+        if soc == soc_name:
             return
 
     logger.critical("This SoC is not Supported!")
@@ -338,38 +246,34 @@ def main():
     usb.util.claim_interface(device, 0)
 
     with open("sboot.bin", "rb") as sboot:
-        for soc_data in exynos_data:
-            if soc == soc_data[0]:
-                for sboot_split in soc_data[2]:
-                    try:
-                        logger.debug(f"Sending file part {sboot_split[0]} (0x{sboot_split[1]:X} - 0x{sboot_split[2]:X})...")
+        for img_name, split_params in EXYNOS_DATA[soc]["bootloader_splits"].items():
+            try:
+                logger.debug(f"Sending file part {img_name} (0x{split_params["start"]:X} - 0x{split_params["end"]:X})...")
 
-                        sboot.seek(sboot_split[1])
-                        sboot_section = load_file(sboot.read(sboot_split[2] - sboot_split[1]))
+                sboot.seek(split_params["start"])
+                sboot_section = load_file(sboot.read(split_params["end"] - split_params["start"]))
 
-                        if sboot_section is None:
-                            logger.critical(f"Failed to load {sboot_split[0]}")
-                            sys.exit(-1)
-
-                        send_part_to_device(device, sboot_section, sboot_split[0])
-                    except Exception as e:
-                        logger.critical(f"Error when trying to process sboot.bin! ({e})")
-                        sys.exit(-1)
-
-                sboot.close()
-
-    for soc_data in exynos_data:
-        if soc == soc_data[0]:
-            for download_file in soc_data[5]:
-                logger.debug(f"Sending file {download_file}...")
-
-                download_data = load_file(download_file)
-
-                if download_data is None:
-                    logger.critical(f"Failed to load {download_file}")
+                if sboot_section is None:
+                    logger.critical(f"Failed to load {img_name}")
                     sys.exit(-1)
 
-                send_part_to_device(device, download_data, download_file)
+                send_part_to_device(device, sboot_section, img_name)
+            except Exception as e:
+                logger.critical(f"Error when trying to process sboot.bin! ({e})")
+                sys.exit(-1)
+
+        sboot.close()
+
+    for file_to_send in EXYNOS_DATA[soc]["files_to_send"]:
+        logger.debug(f"Uploading file {file_to_send}...")
+
+        file_data = load_file(file_to_send)
+
+        if file_data is None:
+            logger.critical(f"Failed to load {file_to_send}")
+            sys.exit(-1)
+
+        send_part_to_device(device, file_data, file_to_send)
 
     usb.util.release_interface(device, 0)
     usb.util.dispose_resources(device)
@@ -378,15 +282,12 @@ def main():
     print()
 
     try:
-        for soc_data in exynos_data:
-            if soc == soc_data[0]:
-                for resultant_lz4 in soc_data[5]:
-                    delete_file(resultant_lz4)
+        for file in EXYNOS_DATA[soc]["lz4_files_to_extract"]:
+            filename_no_lz4 = os.path.splitext(file)[0]
+            delete_file(filename_no_lz4)
 
-                for resultant_bin in soc_data[4]:
-                    filename_no_lz4 = os.path.splitext(resultant_bin)[0]
-
-                    delete_file(filename_no_lz4)
+        for file in EXYNOS_DATA[soc]["files_to_send"]:
+            delete_file(file)
     except:
         logger.critical("Failure in cleaning up! Bailing!")
         sys.exit(-1)
