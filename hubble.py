@@ -162,9 +162,15 @@ def display_and_verify_device_info(device):
     print()
     logger.debug(f"==================== Device Information ====================")
     logger.info(f"SoC: {soc}".center(60))
-    logger.info(f"SoC ID: {usb_serial_num[0:15]}".center(60))
-    logger.info(f"Chip ID: {usb_serial_num[15:31]}".center(60))
-    logger.info(f"USB Booting Version: {usb_booting_version[12:16]}".center(60))
+
+    # Extremely old SoCs don’t host this information
+    if usb_serial_num != None:
+        logger.info(f"SoC ID: {usb_serial_num[0:15]}".center(60))
+        logger.info(f"Chip ID: {usb_serial_num[15:31]}".center(60))
+
+    if usb_booting_version != None:
+        logger.info(f"USB Booting Version: {usb_booting_version[12:16]}".center(60))
+
     print()
 
     for soc_name in EXYNOS_DATA.keys():
