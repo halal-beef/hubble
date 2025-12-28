@@ -1,3 +1,5 @@
+LEGACY_SOCS = ["SEC S5PC210 Test B/D"]
+
 EXYNOS_DATA = {
     "Exynos9830\0": {
         "response_support": True,
@@ -88,6 +90,40 @@ EXYNOS_DATA = {
                 "start": 0x1FD000,
                 "end": 0x23D000,
             }
+        }
+    },
+
+    "Exynos7580\0": {
+        "response_support": False,
+        "files_to_extract_from_tar": ["sboot.bin"],
+        "lz4_files_to_extract": [],
+        "files_to_send": [],
+        "bootloader_splits": {
+            "fwbl1.img": {
+                "start": 0x0,
+                "end": 0x2000,
+            },
+            "bl31.img": {
+                "start": 0x2000,
+                "end": 0x32000,
+            },
+            "bl2.img": {
+                "start": 0x32000,
+                "end": 0x3A000,
+            },
+            "u-boot.bin": {
+                "start": 0x3A000,
+                "end": 0x10B000,
+            }
+        }
+    },
+
+    "SEC S5PC210 Test B/D": { # Legacy SoC, dummy to allow sboot.bin to extract
+        "response_support": False,
+        "files_to_extract_from_tar": ["sboot.bin"],
+        "lz4_files_to_extract": [],
+        "files_to_send": [],
+        "bootloader_splits": {
         }
     }
 }

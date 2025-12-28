@@ -11,8 +11,10 @@ import os
 import coloredlogs
 import logging
 from time import sleep
+import re
 
 from soc_data import EXYNOS_DATA
+from soc_data import LEGACY_SOCS
 
 soc     = ""
 logger  = logging.getLogger(__name__)
@@ -147,8 +149,32 @@ def extract_bl_tar(path):
     print()
 
 def delete_file(filename):
-    os.remove(filename)
-    logger.warning(f"Deleted: {filename}")
+    try:
+        os.remove(filename)
+        logger.warning(f"Deleted: {filename}")
+    except:
+        pass
+
+def legacy_soc_detection():
+    global soc
+
+    with open("sboot.bin", "rb") as sboot:
+        sboot_data = sboot.read()
+        soc_pattern = re.compile(b'EXYNOS[0-9]+')
+        matches = soc_pattern.findall(sboot_data)
+
+        if not matches:
+            logger.critical("Failed to detect SoC from sboot.bin!")
+            sys.exit(-1)
+    
+        soc = f"{matches[0].decode('utf-8').title()}\0"
+
+    for soc_name in EXYNOS_DATA.keys():
+        if soc == soc_name:
+            return
+
+    logger.critical("This SoC is not Supported!")
+    sys.exit(-1)
 
 def display_and_verify_device_info(device):
     global soc
@@ -242,6 +268,11 @@ def main():
     logger.warning("Extracting files...")
     extract_bl_tar(args.bl_tar)
 
+    if soc in LEGACY_SOCS:
+        logger.error("Legacy SoC detected, attempting to detect SoC via S-Boot image.")
+        legacy_soc_detection()
+        logger.error(f"Detected SoC: {soc}")
+
     logger.warning(f"Starting USB booting...")
     print()
 
@@ -286,6 +317,13 @@ def main():
 
     logger.warning("Cleaning up...")
     print()
+
+    # Legacy devices don't have LZ4s to extract, try alternative cleanup
+    for file in EXYNOS_DATA[soc]["files_to_extract_from_tar"]:
+        try:
+            delete_file(file)
+        except:
+            pass
 
     try:
         for file in EXYNOS_DATA[soc]["lz4_files_to_extract"]:
