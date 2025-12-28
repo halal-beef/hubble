@@ -91,7 +91,8 @@ EXYNOS_DATA = {
         }
     },
 
-    "Exynos7580\0": {
+    # Tested on Exynos 7580
+    "SEC S5PC210 Test B/D\00": {
         "response_support": False,
         "files_to_extract_from_tar": ["sboot.bin.lz4"],
         "lz4_files_to_extract": ["sboot.bin.lz4"],
