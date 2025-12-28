@@ -48,7 +48,7 @@ EXYNOS_DATA = {
                 "start": 0x16000,
                 "end": 0x68000,
             },
-            "sboot.bin": {
+            "u-boot.bin": {
                 "start": 0xA4000,
                 "end": 0x224000,
             },
@@ -82,7 +82,7 @@ EXYNOS_DATA = {
                 "start": 0x0,
                 "end": 0x2000,
             },
-            "sboot.bin": {
+            "u-boot.bin": {
                 "start": 0x7D000,
                 "end": 0x1FD000,
             },
