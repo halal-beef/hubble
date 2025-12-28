@@ -46,7 +46,7 @@ EXYNOS_DATA = {
                 "start": 0x16000,
                 "end": 0x68000,
             },
-            "sboot.bin": {
+            "u-boot.bin": {
                 "start": 0xA4000,
                 "end": 0x224000,
             },
@@ -80,13 +80,38 @@ EXYNOS_DATA = {
                 "start": 0x0,
                 "end": 0x2000,
             },
-            "sboot.bin": {
+            "u-boot.bin": {
                 "start": 0x7D000,
                 "end": 0x1FD000,
             },
             "el3_mon.img": {
                 "start": 0x1FD000,
                 "end": 0x23D000,
+            }
+        }
+    },
+
+    "Exynos7580\0": {
+        "response_support": False,
+        "files_to_extract_from_tar": ["sboot.bin.lz4"],
+        "lz4_files_to_extract": ["sboot.bin.lz4"],
+        "files_to_send": [],
+        "bootloader_splits": {
+            "epbl.img": {
+                "start": 0x0,
+                "end": 0x2000,
+            },
+            "fwbl1.img": {
+                "start": 0x2000,
+                "end": 0x32000,
+            },
+            "bl2.img": {
+                "start": 0x32000,
+                "end": 0x3A000,
+            },
+            "u-boot.bin": {
+                "start": 0x3A000,
+                "end": 0x10B000,
             }
         }
     }
