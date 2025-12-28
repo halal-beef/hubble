@@ -31,42 +31,39 @@
 
 https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 
-## Supported devices
+## Supported Devices
 
 | Symbol | Meaning      |
 |:------:|:------------:|
 | ✅     | Working     |
 | ❌     | Not Working |
-| ❔     | Unknown     |
 
 ### Exynos 9830 Devices
 
-| Name                 | Codename | Tested Firmware | Tested by                                   | State |
-|:---------------------|:---------|:---------------:|:--------------------------------------------|:-----:|
-| Galaxy S20           | x1s      | `G981BXXSMHXK1` | [halal-beef](https://github.com/halal-beef) | ✅    |
-| Galaxy S20+          | y2s      | `G986BXXSNHYB1` | [Android-Artisan](https://github.com/Android-Artisan) | ✅    |
-| Galaxy S20 Ultra     | z3s      | `G988BXXSMHXK1` | [BotchedRPR](https://github.com/BotchedRPR) | ✅    |
-| Galaxy S20 FE        | r8s      | `G780FXXUDFWH5` | [Sota4Ever](https://github.com/Sota4Ever)   | ✅    |
-| Galaxy Note 20       | c1s      | ?               | None                                        | ❔    |
-| Galaxy Note 20 Ultra | c2s      | ?               | None                                        | ❔    |
+| Name             | Codename | Tested Firmware | Tested by                                             | State |
+|:-----------------|:---------|:---------------:|:------------------------------------------------------|:-----:|
+| Galaxy S20       | x1s      | `G981BXXSMHXK1` | [halal-beef](https://github.com/halal-beef)           | ✅    |
+| Galaxy S20+      | y2s      | `G986BXXSNHYB1` | [Android-Artisan](https://github.com/Android-Artisan) | ✅    |
+| Galaxy S20 Ultra | z3s      | `G988BXXSMHXK1` | [BotchedRPR](https://github.com/BotchedRPR)           | ✅    |
+| Galaxy S20 FE    | r8s      | `G780FXXUDFWH5` | [Sota4Ever](https://github.com/Sota4Ever)             | ✅    |
 
 ### Exynos 9820 Devices
 
-| Name          | Codename   | Tested Firmware | Tested by                               | State |
-|:--------------|:-----------|:---------------:|:----------------------------------------|:-----:|
-| Galaxy S10    | beyond1lte | `G973FXXSGHWC2` | [Robotix](https://github.com/Robotix22) | ✅    |
-| Galaxy S10e   | beyond0lte | ?               | None                                    | ❔    |
-| Galaxy S10+   | beyond2lte | ?               | None                                    | ❔    |
-| Galaxy S10 5G | beyondx    | ?               | None                                    | ❔    |
+| Name       | Codename   | Tested Firmware | Tested by                               | State |
+|:-----------|:-----------|:---------------:|:----------------------------------------|:-----:|
+| Galaxy S10 | beyond1lte | `G973FXXSGHWC2` | [Robotix](https://github.com/Robotix22) | ✅    |
 
 ### Exynos 9810 Devices
 
-| Name                | Codename   | Tested Firmware | Tested by                               | State |
-|:--------------------|:-----------|:---------------:|:----------------------------------------|:-----:|
-| Galaxy S9           | starlte    | `G960FXXUHFVG4` | [Robotix](https://github.com/Robotix22) | ✅    |
-| Galaxy S9+          | star2lte   | ?               | None                                    | ❔    |
-| Galaxy Note 9       | crownlte   | ?               | None                                    | ❔    |
-| Galaxy Note 10 Lite | davinci    | ?               | None                                    | ❔    |
+| Name      | Codename   | Tested Firmware | Tested by                               | State |
+|:----------|:-----------|:---------------:|:----------------------------------------|:-----:|
+| Galaxy S9 | starlte    | `G960FXXUHFVG4` | [Robotix](https://github.com/Robotix22) | ✅    |
+
+### Exynos 7580 Devices
+
+| Name             | Codename   | Tested Firmware | Tested by                                       | State |
+|:-----------------|:-----------|:---------------:|:------------------------------------------------|:-----:|
+| Galaxy A5 (2016) | a5xelte    | `A510FXXS8CTI7` | [Daniel224455](https://github.com/Daniel224455) | ✅    |
 
 ## Credits
 
@@ -75,5 +72,5 @@ Thanks to these people:
 [VDavid003](https://github.com/vdavid003) for Helping on the BL2 split for Exynos 9830. <br>
 [gaitenis](https://xdaforums.com/m/gaitenis.13049039) found the LK Split for Exynos 9830. <br>
 [halal-beef](https://github.com/halal-beef) for finding most of the Exynos 9830 Splits & for the initial Idea. <br>
-[Robotix](https://github.com/Robotix22) for adding Support for Exynos 9820 & 9810. <br>
+[Robotix](https://github.com/Robotix22) for adding Support for Exynos 9820, 9810 & 7580. <br>
 [alextrack2013](https://github.com/alextrack2013) for adding proper Linux Docs.
