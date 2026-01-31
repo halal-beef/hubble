@@ -49,9 +49,10 @@ https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 
 ### Exynos 9820 Devices
 
-| Name       | Codename   | Tested Firmware | Tested by                               | State |
-|:-----------|:-----------|:---------------:|:----------------------------------------|:-----:|
-| Galaxy S10 | beyond1lte | `G973FXXSGHWC2` | [Robotix](https://github.com/Robotix22) | ✅    |
+| Name          | Codename   | Tested Firmware | Tested by                                 | State |
+|:--------------|:-----------|:---------------:|:------------------------------------------|:-----:|
+| Galaxy S10    | beyond1lte | `G973FXXSGHWC2` | [Robotix](https://github.com/Robotix22)   | ✅    |
+| Galaxy S10 5G | beyondx    | `G977BXXSEHWC1` | [Creeeeger](https://github.com/Creeeeger) | ✅    |
 
 ### Exynos 9810 Devices
 
