@@ -36,11 +36,11 @@ EXYNOS_DATA = {
         "lz4_files_to_extract": ["sboot.bin.lz4"],
         "files_to_send": [],
         "bootloader_splits": {
-            "epbl.img": {
+            "fwbl1.img": {
                 "start": 0x0,
                 "end": 0x3000,
             },
-            "fwbl1.img": {
+            "epbl.img": {
                 "start": 0x3000,
                 "end": 0x16000,
             },
@@ -65,11 +65,11 @@ EXYNOS_DATA = {
         "lz4_files_to_extract": ["sboot.bin.lz4"],
         "files_to_send": [],
         "bootloader_splits": {
-            "epbl.img": {
+            "fwbl1.img": {
                 "start": 0x0,
                 "end": 0x2000,
             },
-            "fwbl1.img": {
+            "epbl.img": {
                 "start": 0x2000,
                 "end": 0x15000,
             },
@@ -78,7 +78,7 @@ EXYNOS_DATA = {
                 "end": 0x64000,
             },
             # Repeat to allow the authentication and load of further images.
-            "epbl.img": {
+            "fwbl1.img": {
                 "start": 0x0,
                 "end": 0x2000,
             },
