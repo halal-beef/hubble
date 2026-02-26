@@ -1,4 +1,5 @@
 import json
+import shutil
 import usb.core
 import usb.util
 import usb.backend.libusb1
@@ -106,45 +107,36 @@ def send_part_to_device(device, file, filename):
 
     print()
 
-def filter_tar(tarinfo, unused):
-    if tarinfo.name in EXYNOS_DATA["files_to_extract_from_tar"]:
-        logger.warning(f"Extracted: {tarinfo.name}")
-        return tarinfo
-
-    return None
-
 def extract_bl_tar(path):
+    output_dir = "./output/"
+
+    os.makedirs (output_dir, exist_ok=True)
+
     with tarfile.open(path, 'r') as tar:
+        members = tar.getmembers()
+
         try:
-            tar.extractall(path='.', members=tar.getmembers(), filter=filter_tar)
+            tar.extractall(path=output_dir, members=members, filter="data")
         except:
             logger.critical("Failure in extracting BL tar! Bailing!")
             sys.exit(-1)
 
-    tar.close()
+        for resultant_bin in members:
+            resultant_bin_path = os.path.join(output_dir, resultant_bin.name)
 
-    for resultant_bin in EXYNOS_DATA["lz4_files_to_extract"]:
-        with open(resultant_bin, 'rb') as input_lz4:
-            try:
-                filename_no_lz4 = os.path.splitext(resultant_bin)[0]
+            with open(resultant_bin_path, 'rb') as input_lz4:
+                try:
+                    filename_no_lz4 = os.path.splitext(resultant_bin_path)[0]
 
-                with open(filename_no_lz4, 'wb') as output_bin:
-                    output_bin.write(lz4.frame.decompress(input_lz4.read()))
+                    with open(filename_no_lz4, 'wb') as output_bin:
+                        output_bin.write(lz4.frame.decompress(input_lz4.read()))
 
-                    output_bin.close()
+                        output_bin.close()
 
-                logger.warning(f"Extracted: {filename_no_lz4}")
-            except:
-                logger.critical("Failure in extracting LZ4 archives! Bailing!")
-                sys.exit(-1)
-
-        input_lz4.close()
-
-        try:
-            delete_file(resultant_bin)
-        except:
-            logger.critical("Failure in preliminary cleanup! Bailing!")
-            sys.exit(-1)
+                    logger.warning(f"Extracted: {resultant_bin.name}")
+                except:
+                    logger.critical("Failure in extracting LZ4 archives! Bailing!")
+                    sys.exit(-1)
 
     print()
 
@@ -156,7 +148,7 @@ def delete_file(filename):
         pass
 
 def legacy_soc_detection():
-    with open("sboot.bin", "rb") as sboot:
+    with open("output/sboot.bin", "rb") as sboot:
         sboot_data = sboot.read()
         soc_pattern = re.compile(b'EXYNOS[0-9]+')
         matches = soc_pattern.findall(sboot_data)
@@ -255,14 +247,14 @@ def main():
     if args.verbose:
         verbose = True
 
+    logger.warning("Extracting files...")
+    extract_bl_tar(args.bl_tar)
+
     logger.warning("Waiting for device")
     device = find_device()
     logger.warning("Found device.")
 
     display_and_verify_device_info(device)
-
-    logger.warning("Extracting files...")
-    extract_bl_tar(args.bl_tar)
 
     logger.warning(f"Starting USB booting...")
     print()
@@ -273,7 +265,7 @@ def main():
 
     usb.util.claim_interface(device, 0)
 
-    with open("sboot.bin", "rb") as sboot:
+    with open("output/sboot.bin", "rb") as sboot:
         for img_name, split_params in EXYNOS_DATA["bootloader_splits"].items():
             try:
                 logger.debug(f"Sending file part {img_name} (0x{split_params["start"]:X} - 0x{split_params["start"] + split_params["length"]:X})...")
@@ -309,23 +301,7 @@ def main():
     logger.warning("Cleaning up...")
     print()
 
-    # Legacy devices don't have LZ4s to extract, try alternative cleanup
-    for file in EXYNOS_DATA["files_to_extract_from_tar"]:
-        try:
-            delete_file(file)
-        except:
-            pass
-
-    try:
-        for file in EXYNOS_DATA["lz4_files_to_extract"]:
-            filename_no_lz4 = os.path.splitext(file)[0]
-            delete_file(filename_no_lz4)
-
-        for file in EXYNOS_DATA["files_to_send"]:
-            delete_file(file)
-    except:
-        logger.critical("Failure in cleaning up! Bailing!")
-        sys.exit(-1)
+    shutil.rmtree ("./output")
 
     print()
     logger.error("You should be in download mode now, please reflash the stock firmware as the bootloader will still be wiped.")
