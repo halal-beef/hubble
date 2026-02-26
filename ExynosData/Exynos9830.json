@@ -1,6 +1,6 @@
 {
     "response_support": true,
-    "files_to_send": ["ldfw.img.lz4", "tzsw.img.lz4"],
+    "files_to_send": ["ldfw.img", "tzsw.img"],
     "bootloader_splits": {
         "fwbl1.bin": {
             "start": 0,
