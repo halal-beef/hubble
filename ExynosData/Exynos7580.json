@@ -1,0 +1,27 @@
+{
+    "response_support": false,
+    "files_to_extract_from_tar": ["sboot.bin"],
+    "lz4_files_to_extract": [],
+    "files_to_send": [],
+    "bootloader_splits": {
+        "fwbl1.bin": {
+            "start": 0,
+            "length": 8192
+        },
+
+        "bl31.bin": {
+            "start": 8192,
+            "length": 196608
+        },
+
+        "bl2.bin": {
+            "start": 204800,
+            "length": 32768
+        },
+
+        "u-boot.bin": {
+            "start": 237568,
+            "length": 856064
+        }
+    }
+}

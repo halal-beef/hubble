@@ -1,0 +1,37 @@
+{
+    "response_support": false,
+    "files_to_extract_from_tar": ["sboot.bin.lz4"],
+    "lz4_files_to_extract": ["sboot.bin.lz4"],
+    "files_to_send": [],
+    "bootloader_splits": {
+        "fwbl1.bin": {
+            "start": 0,
+            "length": 8192
+        },
+
+        "epbl.bin": {
+            "start": 8192,
+            "length": 77824
+        },
+
+        "bl2.bin": {
+            "start": 86016,
+            "length": 323584
+        },
+
+        "repeat-fwbl1.bin": {
+            "start": 0,
+            "length": 8192
+        },
+
+        "u-boot.bin": {
+            "start": 512000,
+            "length": 1572864
+        },
+
+        "el3_mon.bin": {
+            "start": 2084864,
+            "length": 262144
+        }
+    }
+}

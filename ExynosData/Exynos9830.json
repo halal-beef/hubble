@@ -1,0 +1,32 @@
+{
+    "response_support": true,
+    "files_to_extract_from_tar": ["sboot.bin.lz4", "ldfw.img.lz4", "tzsw.img.lz4"],
+    "lz4_files_to_extract": ["sboot.bin.lz4"],
+    "files_to_send": ["ldfw.img.lz4", "tzsw.img.lz4"],
+    "bootloader_splits": {
+        "fwbl1.bin": {
+            "start": 0,
+            "length": 12288
+        },
+
+        "epbl.bin": {
+            "start": 12288,
+            "length": 77824
+        },
+
+        "bl2.bin": {
+            "start": 90112,
+            "length": 442368
+        },
+
+        "lk.bin": {
+            "start": 897024,
+            "length": 2621440
+        },
+
+        "el3_mon.bin": {
+            "start": 3518464,
+            "length": 262144
+        }
+    }
+}

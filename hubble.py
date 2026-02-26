@@ -1,3 +1,4 @@
+import json
 import usb.core
 import usb.util
 import usb.backend.libusb1
@@ -13,8 +14,7 @@ import logging
 from time import sleep
 import re
 
-from soc_data import EXYNOS_DATA
-from soc_data import LEGACY_SOCS
+EXYNOS_DATA = None
 
 soc     = ""
 logger  = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ def send_part_to_device(device, file, filename):
 
     ret = device.write(2, file, timeout=50000)
 
-    if EXYNOS_DATA[soc]["response_support"] == True and verbose == True:
+    if EXYNOS_DATA["response_support"] == True and verbose == True:
         while True:
             try:
                 data = device.read(0x81, 512, timeout=1000)
@@ -107,7 +107,7 @@ def send_part_to_device(device, file, filename):
     print()
 
 def filter_tar(tarinfo, unused):
-    if tarinfo.name in EXYNOS_DATA[soc]["files_to_extract_from_tar"]:
+    if tarinfo.name in EXYNOS_DATA["files_to_extract_from_tar"]:
         logger.warning(f"Extracted: {tarinfo.name}")
         return tarinfo
 
@@ -123,7 +123,7 @@ def extract_bl_tar(path):
 
     tar.close()
 
-    for resultant_bin in EXYNOS_DATA[soc]["lz4_files_to_extract"]:
+    for resultant_bin in EXYNOS_DATA["lz4_files_to_extract"]:
         with open(resultant_bin, 'rb') as input_lz4:
             try:
                 filename_no_lz4 = os.path.splitext(resultant_bin)[0]
@@ -156,8 +156,6 @@ def delete_file(filename):
         pass
 
 def legacy_soc_detection():
-    global soc
-
     with open("sboot.bin", "rb") as sboot:
         sboot_data = sboot.read()
         soc_pattern = re.compile(b'EXYNOS[0-9]+')
@@ -166,22 +164,15 @@ def legacy_soc_detection():
         if not matches:
             logger.critical("Failed to detect SoC from sboot.bin!")
             sys.exit(-1)
-    
-        soc = f"{matches[0].decode('utf-8').title()}\0"
 
-    for soc_name in EXYNOS_DATA.keys():
-        if soc == soc_name:
-            return
-
-    logger.critical("This SoC is not Supported!")
-    sys.exit(-1)
+        return f"{matches[0].decode('utf-8').title()}"
 
 def display_and_verify_device_info(device):
-    global soc
+    global EXYNOS_DATA
 
     device_config = device.get_active_configuration()
 
-    soc = usb.util.get_string(device, device.iProduct)
+    soc = usb.util.get_string(device, device.iProduct).strip("\0")
     usb_serial_num = usb.util.get_string(device, device.iSerialNumber)
     usb_booting_version = usb.util.get_string(device, device_config[(0, 0)].iInterface)
 
@@ -199,12 +190,17 @@ def display_and_verify_device_info(device):
 
     print()
 
-    for soc_name in EXYNOS_DATA.keys():
-        if soc == soc_name:
-            return
+    if soc == "SEC S5PC210 Test B/D":
+        logger.error("Legacy SoC detected, attempting to detect SoC via S-Boot image.")
+        soc = legacy_soc_detection()
+        logger.error(f"Detected SoC: {soc}")
 
-    logger.critical("This SoC is not Supported!")
-    sys.exit(-1)
+    try:
+        with open (f"ExynosData/{soc}.json", "r") as f:
+            EXYNOS_DATA = json.load (f)
+    except:
+        logger.critical("This SoC is not Supported!")
+        sys.exit(-1)
 
 def main():
     global verbose
@@ -268,11 +264,6 @@ def main():
     logger.warning("Extracting files...")
     extract_bl_tar(args.bl_tar)
 
-    if soc in LEGACY_SOCS:
-        logger.error("Legacy SoC detected, attempting to detect SoC via S-Boot image.")
-        legacy_soc_detection()
-        logger.error(f"Detected SoC: {soc}")
-
     logger.warning(f"Starting USB booting...")
     print()
 
@@ -283,12 +274,12 @@ def main():
     usb.util.claim_interface(device, 0)
 
     with open("sboot.bin", "rb") as sboot:
-        for img_name, split_params in EXYNOS_DATA[soc]["bootloader_splits"].items():
+        for img_name, split_params in EXYNOS_DATA["bootloader_splits"].items():
             try:
-                logger.debug(f"Sending file part {img_name} (0x{split_params["start"]:X} - 0x{split_params["end"]:X})...")
+                logger.debug(f"Sending file part {img_name} (0x{split_params["start"]:X} - 0x{split_params["start"] + split_params["length"]:X})...")
 
                 sboot.seek(split_params["start"])
-                sboot_section = load_file(sboot.read(split_params["end"] - split_params["start"]))
+                sboot_section = load_file(sboot.read(split_params["length"]))
 
                 if sboot_section is None:
                     logger.critical(f"Failed to load {img_name}")
@@ -301,7 +292,7 @@ def main():
 
         sboot.close()
 
-    for file_to_send in EXYNOS_DATA[soc]["files_to_send"]:
+    for file_to_send in EXYNOS_DATA["files_to_send"]:
         logger.debug(f"Uploading file {file_to_send}...")
 
         file_data = load_file(file_to_send)
@@ -319,18 +310,18 @@ def main():
     print()
 
     # Legacy devices don't have LZ4s to extract, try alternative cleanup
-    for file in EXYNOS_DATA[soc]["files_to_extract_from_tar"]:
+    for file in EXYNOS_DATA["files_to_extract_from_tar"]:
         try:
             delete_file(file)
         except:
             pass
 
     try:
-        for file in EXYNOS_DATA[soc]["lz4_files_to_extract"]:
+        for file in EXYNOS_DATA["lz4_files_to_extract"]:
             filename_no_lz4 = os.path.splitext(file)[0]
             delete_file(filename_no_lz4)
 
-        for file in EXYNOS_DATA[soc]["files_to_send"]:
+        for file in EXYNOS_DATA["files_to_send"]:
             delete_file(file)
     except:
         logger.critical("Failure in cleaning up! Bailing!")
