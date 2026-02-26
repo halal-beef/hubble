@@ -287,13 +287,16 @@ def main():
     for file_to_send in EXYNOS_DATA["files_to_send"]:
         logger.debug(f"Uploading file {file_to_send}...")
 
-        file_data = load_file(file_to_send)
+        file_data = load_file(f"output/{file_to_send}")
 
         if file_data is None:
             logger.critical(f"Failed to load {file_to_send}")
             sys.exit(-1)
 
-        send_part_to_device(device, file_data, file_to_send)
+        try:
+            send_part_to_device(device, file_data, file_to_send)
+        except:
+            pass
 
     usb.util.release_interface(device, 0)
     usb.util.dispose_resources(device)
