@@ -1,7 +1,5 @@
 {
     "response_support": true,
-    "files_to_extract_from_tar": ["sboot.bin.lz4", "ldfw.img.lz4", "tzsw.img.lz4"],
-    "lz4_files_to_extract": ["sboot.bin.lz4"],
     "files_to_send": ["ldfw.img.lz4", "tzsw.img.lz4"],
     "bootloader_splits": {
         "fwbl1.bin": {

@@ -1,7 +1,5 @@
 {
     "response_support": false,
-    "files_to_extract_from_tar": ["sboot.bin"],
-    "lz4_files_to_extract": [],
     "files_to_send": [],
     "bootloader_splits": {
         "fwbl1.bin": {
