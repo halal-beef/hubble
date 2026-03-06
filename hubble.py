@@ -75,6 +75,31 @@ def find_device():
             print()
             return device
 
+def print_crash_info(crash_str):
+    logger.critical(f"Crash information:")
+    chunks = [crash_str[i:i+8] for i in range(0, len(crash_str), 8)]
+
+    version = chunks[1]
+    soc_id = chunks[2]
+    chip_id0 = chunks[3]
+    chip_id1 = chunks[4]
+    rst_stat = chunks[9]
+    om_stat = chunks[11]
+    key_bank_addr = chunks[13]
+    bootdevice_information = chunks[26]
+    status_reg0 = chunks[27]
+    status_reg1 = chunks[28]
+    
+    logger.critical(f"Version: {version}")
+    logger.critical(f"SoC ID: {soc_id}")
+    logger.critical(f"Chip IDs: {chip_id0}, {chip_id1}")
+    logger.critical(f"Reset Status: {rst_stat}")
+    logger.critical(f"OM Status: {om_stat}")
+    logger.critical(f"Key Bank Address: {key_bank_addr}")
+    logger.critical(f"Boot Device Info: {bootdevice_information}")
+    logger.critical(f"Status Registers: {status_reg0}, {status_reg1}")
+
+
 def send_part_to_device(device, file, filename):
     file_size = len(file)
 
@@ -94,7 +119,25 @@ def send_part_to_device(device, file, filename):
                 response = byte_str.split('\x00',1)[0]
 
                 if len(response) != 0:
-                    logger.debug(f"=> Device Response: {response}")
+                    if not "UUUUUUUU" in response:
+                        logger.debug(f"=> Device Response: {response}")
+                    else:
+                        logger.critical("BootROM Crash Detected")
+                        tmp = response
+
+                        try:
+                            data = device.read(0x81, 512, timeout=1000)
+
+                            byte_str = ''.join(chr(n) for n in data[0:])
+                            response = byte_str.split('\x00',1)[0]
+
+                            if len(response) != 0:
+                                tmp = f"{tmp}{response}"
+                        except:
+                            break
+
+                        tmp = tmp[2:]
+                        print_crash_info(tmp)
             except:
                 break
 
