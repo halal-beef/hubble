@@ -7,7 +7,7 @@
             "length": 8192
         },
 
-        "epbl.bin": {
+        "bl31.bin": {
             "start": 8192,
             "length": 77824
         },
