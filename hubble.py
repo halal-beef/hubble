@@ -25,6 +25,7 @@ def write_u32(value):
     return struct.pack('<I', value)
 
 def write_header(data, size):
+    data[0:4] = b"\x1BDNW"
     data[4:8] = write_u32(size)
 
 def load_file(file_input):
@@ -46,10 +47,8 @@ def load_file(file_input):
         logger.critical(f"Error loading file: {e}")
         return None
 
-def calculate_checksum(data):
-    checksum = sum(data[8:-2]) & 0xFFFF
-    logger.warning(f"=> Data checksum {checksum:04X}")
-    data[-2:] = struct.pack('<H', checksum)
+def append_checksum(data):
+    data[-2:] = struct.pack('<H', 0xFFFF)
 
 def find_device():
     usb_backend = None
@@ -103,17 +102,17 @@ def print_crash_info(crash_str):
 def send_part_to_device(device, file, filename):
     file_size = len(file)
 
-    logger.warning(f"=> Downloading {file_size} bytes")
+    logger.warning(f"=> Uploading {file_size} bytes")
 
     write_header(file, file_size)
-    calculate_checksum(file)
+    append_checksum(file)
 
     ret = device.write(2, file, timeout=50000)
 
     if EXYNOS_DATA["response_support"] == True and verbose == True:
         while True:
             try:
-                data = device.read(0x81, 512, timeout=1000)
+                data = device.read(0x81, 512, timeout=50)
 
                 byte_str = ''.join(chr(n) for n in data[0:])
                 response = byte_str.split('\x00',1)[0]
@@ -126,7 +125,7 @@ def send_part_to_device(device, file, filename):
                         tmp = response
 
                         try:
-                            data = device.read(0x81, 512, timeout=1000)
+                            data = device.read(0x81, 512, timeout=50)
 
                             byte_str = ''.join(chr(n) for n in data[0:])
                             response = byte_str.split('\x00',1)[0]
