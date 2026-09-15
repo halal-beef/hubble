@@ -1,5 +1,5 @@
 {
-    "response_support": true,
+    "response_support": false,
     "files_to_send": [],
     "bootloader_splits": {
         "fwbl1.bin": {
