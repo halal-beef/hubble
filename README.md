@@ -66,6 +66,12 @@ https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 |:-----------|:-----------|:---------------:|:--------------------------------------------|:-----:|
 | Galaxy A51 | a51        | `A515FXXU8HWK1` | [AlexFurina](https://github.com/AlexFurina) |✅     |
 
+### Exynos 7885 Devices
+
+| Name       	   | Codename   | Tested Firmware | Tested by                                   | State |
+|:-----------	   |:-----------|:---------------:|:--------------------------------------------|:-----:|
+| Galaxy A8 (2018) | jackpotlte | `A530FXXULCUK6` | [kdetechy-mp4](https://github.com/kdetechy-mp4) |✅  |
+
 ### Exynos 7580 Devices
 
 | Name             | Codename   | Tested Firmware | Tested by                                       | State |
