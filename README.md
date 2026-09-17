@@ -59,6 +59,7 @@ https://github.com/user-attachments/assets/78ca9dda-04c2-45d3-ad47-5a713086e33e
 | Name      | Codename   | Tested Firmware | Tested by                               | State |
 |:----------|:-----------|:---------------:|:----------------------------------------|:-----:|
 | Galaxy S9 | starlte    | `G960FXXUHFVG4` | [Robotix](https://github.com/Robotix22) | ✅    |
+| Galaxy Note 10 Lite | r7      | `N770FXXS9HXA3` | [bavalucket](https://github.com/bavalucket) | ✅   |
 
 ### Exynos 9610 Devices
 
